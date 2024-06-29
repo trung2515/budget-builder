@@ -1,0 +1,118 @@
+<div class="p-10">
+  <div class="mb-4">
+    <label>Select month:</label>
+    <input
+      class="w-40 mx-8"
+      type="month"
+      [(ngModel)]="startMonth"
+      (change)="updateMonths()"
+    />
+    <input
+      class="w-40"
+      type="month"
+      [(ngModel)]="endMonth"
+      (change)="updateMonths()"
+    />
+  </div>
+
+  <div class="relative overflow-x-auto">
+    <table class="w-full text-sm text-left rtl:text-right border">
+      <thead class="text-xs uppercase bg-gray-50 dark:bg-gray-700">
+        <tr>
+          <th class="py-3 border-l border-gray-300">
+            From {{ months[0] }} to {{ months[months.length - 1] }}
+          </th>
+          <ng-container *ngFor="let month of months">
+            <th class="py-3 border-l border-gray-300">{{ month }}</th>
+          </ng-container>
+        </tr>
+      </thead>
+
+      <ng-container *ngFor="let section of budgetSections">
+        <tbody>
+          <tr class="border border-x-0">
+            <td>{{ section.title }}</td>
+          </tr>
+          <tr
+            *ngFor="let item of section.data; let i = index"
+            class="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+          >
+            <td>{{ item.category }}</td>
+            <ng-container *ngFor="let value of item.expenseValue; let j = index ; trackBy: trackByFn">
+              <td class="border-l border-gray-300">
+                <input
+                  class="outline-none border-none w-full"
+                  type="number"
+                  [(ngModel)]="item.expenseValue[j]"
+                />
+              </td>
+            </ng-container>
+          </tr>
+          <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+            <td>
+              <input
+                type="text"
+                (keydown.enter)="addRow(section)"
+                [(ngModel)]="section.newItemName"
+                placeholder="Add new"
+                class="border w-full"
+              />
+            </td>
+            <ng-container *ngFor="let month of months">
+              <td class="border-l border-gray-300"></td>
+            </ng-container>
+          </tr>
+          <tr class="h-7 border border-x-0" *ngIf="section.key === 'income'" >
+          
+          </tr>
+          <tr class="font-semibold" *ngIf="['income', 'expensesSystem'].includes(section.key)">
+            <td> {{ section.key === 'income' ? 'Total Income':'Sub Total' }}</td>
+            <ng-container *ngFor="let month of months; let i = index;">
+              <td>{{ calculateTotal(section.key, i) }}</td>
+            </ng-container>
+          </tr>
+          <tr class="h-7 border border-x-0" *ngIf="section.key === 'income'">
+          </tr>
+        </tbody>
+      </ng-container>
+
+      <tfoot>
+        <tr
+          class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 h-7 border border-x-none"
+        ></tr>
+        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 font-semibold">
+          <td>Total Expenses</td>
+          <ng-container *ngFor="let i of months; let idx = index">
+            <td class="border-l border-gray-300">
+              {{ calculateBudget().totalExpenses[idx] }}
+            </td>
+          </ng-container>
+        </tr>
+        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 font-semibold">
+          <td class="border-l border-gray-300">Profit / Loss</td>
+          <ng-container *ngFor="let i of months; let idx = index">
+            <td class="border-l border-gray-300">
+              {{ calculateBudget().profitOrLoss[idx] }}
+            </td>
+          </ng-container>
+        </tr>
+        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 font-semibold">
+          <td class="border-l border-gray-300">Opening Balance</td>
+          <ng-container *ngFor="let i of months; let idx = index">
+            <td class="border-l border-gray-300">
+              {{ calculateBudget().openingBalance[idx] }}
+            </td>
+          </ng-container>
+        </tr>
+        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 font-semibold">
+          <td class="border-l border-gray-300">Closing Balance</td>
+          <ng-container *ngFor="let i of months; let idx = index">
+            <td class="border-l border-gray-300">
+              {{ calculateBudget().closingBalance[idx] }}
+            </td>
+          </ng-container>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
